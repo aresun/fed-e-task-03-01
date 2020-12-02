@@ -27,6 +27,8 @@ export default class VueRouter {
     });
   }
 
+
+  
   constructor(options) {
     this.options = options;
     this.route_map = {};
