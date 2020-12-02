@@ -27,7 +27,7 @@ export default class VueRouter {
     });
   }
 
-
+sdfasfas
   
   constructor(options) {
     this.options = options;
