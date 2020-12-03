@@ -39,6 +39,7 @@ export default class VueRouter {
   init() {
     this.create_route_map();
     this.init_components(_Vue);
+    this.init_event();
   }
 
   create_route_map() {
@@ -57,7 +58,46 @@ export default class VueRouter {
       props: {
         to: String,
       },
-      template: '<a :href="to"><slot></slot></a>',
+      // below need compiler support:
+      // template: '<a :href="to"><slot></slot></a>',
+
+      // h is from vue, to create virtual dom
+      render(h) {
+        const selector = `a`;
+        const properties = {
+          attrs: {
+            href: this.to, // component'sF prop: to
+          },
+          on: {
+            click: this.clickHandler,
+          },
+        };
+        const children_elements = [this.$slots.default];
+
+        return h(selector, properties, children_elements);
+      },
+      methods: {
+        clickHandler(e) {
+          history.pushState({}, "", this.to);
+          this.$router.data.current = this.to;
+          e.preventDefault();
+        },
+      },
+    });
+
+    const self = this; // self -> VueRouter's instance
+    // create <router-view>
+    Vue.component(`router-view`, {
+      render(h) {
+        const component = self.route_map[self.data.current];
+        return h(component);
+      },
+    });
+  }
+
+  init_event() {
+    window.addEventListener(`popstate`, () => {
+      this.data.current = window.location.pathname;
     });
   }
 }
